@@ -30,6 +30,9 @@ struct K {
             k[i] = floor(fabs(sin(i + 1.0)) * pow(2, 32));
         }
     }
+    inline unsigned int operator[](size_t i){
+        return k[i];
+    }
     unsigned int k[64];
 } k;
 
@@ -39,7 +42,7 @@ void normalize_message(std::vector<unsigned char> &message) {
     uint64_t resize_bit_count = (((bit_count + 64) / 512)) * 512 + 448;
     message.resize(message.size() + 1, 128);
     message.resize(resize_bit_count / 8, '\0');
-    
+
     for(int i = 1;i <= 8; i++){
         unsigned int byte_data = (bit_count % (1 << (8 * i)) >> 8 * (i - 1));
         message.resize(resize_bit_count / 8 + i, byte_data);
@@ -87,7 +90,7 @@ static void round_process(unsigned int &a, unsigned int &b, unsigned &c, unsigne
     unsigned int temp = d;
     d = c;
     c = b;
-    b = left_rotate(a + f + chunck + k.k[i], r[i]) + b;
+    b = left_rotate(a + f + chunck + k[i], r[i]) + b;
     a = temp;
 }
 
@@ -109,7 +112,7 @@ std::string md5(std::string &origin_message){
     for (unsigned char c: origin_message){
         message.push_back(c);
     }
-    
+
     normalize_message(message);
 
     for(int i = 0;i < message.size() / 64;i++) {
